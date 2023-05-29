@@ -1,0 +1,41 @@
+<component name="libraryTable">
+  <library name="rocksdb" type="mix">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/rocksdb/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/rocksdb/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/rocksdb/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/rocksdb/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/rocksdb/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/rocksdb/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/rocksdb/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/rocksdb/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/rocksdb/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/rocksdb/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/rocksdb/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/rocksdb/ebin" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/deps/rocksdb/src" />
+      <root url="file://$PROJECT_DIR$/deps/rocksdb/c_src" />
+      <root url="file://$PROJECT_DIR$/deps/rocksdb/src" />
+      <root url="file://$PROJECT_DIR$/deps/rocksdb/priv" />
+      <root url="file://$PROJECT_DIR$/deps/rocksdb/c_src" />
+      <root url="file://$PROJECT_DIR$/deps/rocksdb/src" />
+      <root url="file://$PROJECT_DIR$/deps/rocksdb/priv" />
+      <root url="file://$PROJECT_DIR$/deps/rocksdb/c_src" />
+      <root url="file://$PROJECT_DIR$/deps/rocksdb/src" />
+      <root url="file://$PROJECT_DIR$/deps/rocksdb/priv" />
+      <root url="file://$PROJECT_DIR$/deps/rocksdb/c_src" />
+      <root url="file://$PROJECT_DIR$/deps/rocksdb/src" />
+      <root url="file://$PROJECT_DIR$/deps/rocksdb/priv" />
+      <root url="file://$PROJECT_DIR$/deps/rocksdb/c_src" />
+      <root url="file://$PROJECT_DIR$/deps/rocksdb/src" />
+      <root url="file://$PROJECT_DIR$/deps/rocksdb/priv" />
+      <root url="file://$PROJECT_DIR$/deps/rocksdb/c_src" />
+      <root url="file://$PROJECT_DIR$/deps/rocksdb/src" />
+      <root url="file://$PROJECT_DIR$/deps/rocksdb/priv" />
+      <root url="file://$PROJECT_DIR$/deps/rocksdb/c_src" />
+    </SOURCES>
+  </library>
+</component>

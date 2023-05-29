@@ -1,0 +1,41 @@
+<component name="libraryTable">
+  <library name="prometheus_process_collector" type="mix">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/prometheus_process_collector/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/prometheus_process_collector/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/prometheus_process_collector/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/prometheus_process_collector/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/prometheus_process_collector/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/prometheus_process_collector/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/prometheus_process_collector/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/prometheus_process_collector/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/prometheus_process_collector/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/prometheus_process_collector/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/prometheus_process_collector/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/prometheus_process_collector/ebin" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/deps/prometheus_process_collector/src" />
+      <root url="file://$PROJECT_DIR$/deps/prometheus_process_collector/c_src" />
+      <root url="file://$PROJECT_DIR$/deps/prometheus_process_collector/src" />
+      <root url="file://$PROJECT_DIR$/deps/prometheus_process_collector/priv" />
+      <root url="file://$PROJECT_DIR$/deps/prometheus_process_collector/c_src" />
+      <root url="file://$PROJECT_DIR$/deps/prometheus_process_collector/src" />
+      <root url="file://$PROJECT_DIR$/deps/prometheus_process_collector/priv" />
+      <root url="file://$PROJECT_DIR$/deps/prometheus_process_collector/c_src" />
+      <root url="file://$PROJECT_DIR$/deps/prometheus_process_collector/src" />
+      <root url="file://$PROJECT_DIR$/deps/prometheus_process_collector/priv" />
+      <root url="file://$PROJECT_DIR$/deps/prometheus_process_collector/c_src" />
+      <root url="file://$PROJECT_DIR$/deps/prometheus_process_collector/src" />
+      <root url="file://$PROJECT_DIR$/deps/prometheus_process_collector/priv" />
+      <root url="file://$PROJECT_DIR$/deps/prometheus_process_collector/c_src" />
+      <root url="file://$PROJECT_DIR$/deps/prometheus_process_collector/src" />
+      <root url="file://$PROJECT_DIR$/deps/prometheus_process_collector/priv" />
+      <root url="file://$PROJECT_DIR$/deps/prometheus_process_collector/c_src" />
+      <root url="file://$PROJECT_DIR$/deps/prometheus_process_collector/src" />
+      <root url="file://$PROJECT_DIR$/deps/prometheus_process_collector/priv" />
+      <root url="file://$PROJECT_DIR$/deps/prometheus_process_collector/c_src" />
+    </SOURCES>
+  </library>
+</component>
