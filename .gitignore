@@ -35,3 +35,13 @@ arweave_ex-*.tar
 npm-debug.log
 /assets/node_modules/
 
+.idea
+
+ar_tx_blacklist
+data
+data_sync_state
+disk_cache
+header_sync_state
+rocksdb
+wallets
+logs

@@ -11,9 +11,17 @@
       <root url="file://$PROJECT_DIR$/_build/dev/lib/prometheus_cowboy/ebin" />
       <root url="file://$PROJECT_DIR$/_build/dev/lib/prometheus_cowboy/ebin" />
       <root url="file://$PROJECT_DIR$/_build/dev/lib/prometheus_cowboy/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/prometheus_cowboy/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/prometheus_cowboy/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/prometheus_cowboy/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/prometheus_cowboy/ebin" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
+      <root url="file://$PROJECT_DIR$/deps/prometheus_cowboy/lib" />
+      <root url="file://$PROJECT_DIR$/deps/prometheus_cowboy/src" />
+      <root url="file://$PROJECT_DIR$/deps/prometheus_cowboy/lib" />
+      <root url="file://$PROJECT_DIR$/deps/prometheus_cowboy/src" />
       <root url="file://$PROJECT_DIR$/deps/prometheus_cowboy/lib" />
       <root url="file://$PROJECT_DIR$/deps/prometheus_cowboy/src" />
       <root url="file://$PROJECT_DIR$/deps/prometheus_cowboy/lib" />

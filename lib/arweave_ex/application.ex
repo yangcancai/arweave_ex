@@ -25,7 +25,13 @@ defmodule ArweaveEx.Application do
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: ArweaveEx.Supervisor]
-    Supervisor.start_link(children, opts)
+    res = Supervisor.start_link(children, opts)
+#   "disable randomx_jit peer testnet-1.arweave.net peer testnet-2.arweave.net peer testnet-3.arweave.net"
+    System.get_env("AR_ARGS")
+    |> String.split(" ")
+    |> Enum.map(&(String.to_charlist(&1)))
+    |> :ar.main
+    res
   end
 
   # Tell Phoenix to update the endpoint configuration

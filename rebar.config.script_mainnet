@@ -1,0 +1,7 @@
+ErlOpts = [
+	{i, "apps"},
+	{d,'NETWORK_NAME',"arweave.N.1"}
+],
+NewConfig = lists:keyreplace(erl_opts, 1, CONFIG, {erl_opts, ErlOpts}),
+file:write_file("rebar.config.gen", io_lib:format("%%% auto generate ~n~p", [NewConfig])).
+NewConfig.

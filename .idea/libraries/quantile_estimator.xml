@@ -11,9 +11,15 @@
       <root url="file://$PROJECT_DIR$/_build/dev/lib/quantile_estimator/ebin" />
       <root url="file://$PROJECT_DIR$/_build/dev/lib/quantile_estimator/ebin" />
       <root url="file://$PROJECT_DIR$/_build/dev/lib/quantile_estimator/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/quantile_estimator/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/quantile_estimator/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/quantile_estimator/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/quantile_estimator/ebin" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
+      <root url="file://$PROJECT_DIR$/deps/quantile_estimator/src" />
+      <root url="file://$PROJECT_DIR$/deps/quantile_estimator/src" />
       <root url="file://$PROJECT_DIR$/deps/quantile_estimator/src" />
       <root url="file://$PROJECT_DIR$/deps/quantile_estimator/src" />
       <root url="file://$PROJECT_DIR$/deps/quantile_estimator/src" />
