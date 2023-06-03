@@ -17,9 +17,12 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
   * Forum: https://elixirforum.com/c/phoenix-forum
   * Source: https://github.com/phoenixframework/phoenix
 ## First, Setup 
+```shell
 $ sh tool.sh setup
+```
 
 ## Start testnet node
+```shell
 ➜  arweave_ex git:(main) ✗ sh tool.sh testnet        
 make: `/Users/xx/proj/elixir/arweave_ex/arweave/apps/ar_sqlite3/c_src/../priv/ar_sqlite3_driver' is up to date.
 ===> Analyzing applications...
@@ -389,11 +392,15 @@ BREAK: (a)bort (A)bort with dump (c)ontinue (p)roc info (i)nfo
 a
 [os_mon] cpu supervisor port (cpu_sup): Erlang has closed
 [os_mon] memory supervisor port (memsup): Erlang has closed
-
+```
 ## Check the testnet node info
+```shell
 ➜  arweave_ex git:(main) ✗
 arweave_ex git:(main) ✗ curl http://127.0.0.1:1984/
 {"network":"arweave.2.6.testnet","version":5,"release":62,"height":1191305,"current":"I8x0eMXrqGCY1V_VQ0VbtuA4_pW6n0Ll5XAOHY2Vlq-1kmgDh78Bsc55eeXX4F2J","blocks":9,"peers":0,"queue_length":0,"node_state_latency":281}% 
 
+```
 ## Start the mainnet node
+```shell
 $ sh tool.sh mainnet
+```
