@@ -15,9 +15,13 @@ mix local.rebar rebar3 ./rebar3
 # 2. Fix mac df shell
 # 3. replace rebar.config.script
 # 4. mix compile
+mix deps.get
+cd arweave
+./rebar3 compile
+cd ..
 mix compile
 # 5. cp priv or data
-cp arweave/_build/default/lib/arweave/priv/* _build/dev/lib/arweave/priv/
+cp -r arweave/_build/default/lib/arweave/priv _build/dev/lib/arweave/
 cp -r arweave/data data
 }
 #iex --erl "+MBas aobf +MBlmbcs 512 +Ktrue +A20 +SDio20 +sbwtvery_long +sbwtdcpuvery_long +sbwtdiovery_long +swtvery_low +swtdcpuvery_low +swtdiovery_low +Bi " -S mix phx.server
