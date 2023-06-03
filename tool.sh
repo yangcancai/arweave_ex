@@ -10,29 +10,22 @@ else
 fi
 setup(){
 git submodule update --init --recursive
-# 1. Fix rebar3
-mix local.rebar rebar3 ./rebar3
-# 2. Fix mac df shell
-# 3. replace rebar.config.script
-# 4. mix compile
+# 1. Fix mac df shell
+# 2. replace rebar.config.script
+# 3. mix compile
 mix deps.get
-cd arweave
-./rebar3 compile
-cd ..
-mix compile
-# 5. cp priv or data
-cp -r arweave/_build/default/lib/arweave/priv _build/dev/lib/arweave/
+cp rebar.config arweave/apps/arweave/
 cp -r arweave/data data
 }
 #iex --erl "+MBas aobf +MBlmbcs 512 +Ktrue +A20 +SDio20 +sbwtvery_long +sbwtdcpuvery_long +sbwtdiovery_long +swtvery_low +swtdcpuvery_low +swtdiovery_low +Bi " -S mix phx.server
 testnet(){
-  cp rebar.config.script_testnet arweave/rebar.config.script
+  cp rebar.config.script_testnet arweave/apps/arweave/rebar.config.script
   mix compile
   export AR_ARGS="$RANDOMX_JIT peer testnet-1.arweave.net peer testnet-2.arweave.net peer testnet-3.arweave.net"
   iex --erl "+MBas aobf +MBlmbcs 512 +Ktrue +A20 +SDio20 +sbwtvery_long +sbwtdcpuvery_long +sbwtdiovery_long +swtvery_low +swtdcpuvery_low +swtdiovery_low " -S mix phx.server
 }
 mainnet(){
-  cp rebar.config.script_mainnet arweave/rebar.config.script
+  cp rebar.config.script_mainnet arweave/apps/arweave/rebar.config.script
   mix compile
   export AR_ARGS="$RANDOMX_JIT peer 188.166.200.45 peer 188.166.192.169 peer 163.47.11.64 peer 139.59.51.59 peer 138.197.232.192"
   iex --erl "+MBas aobf +MBlmbcs 512 +Ktrue +A20 +SDio20 +sbwtvery_long +sbwtdcpuvery_long +sbwtdiovery_long +swtvery_low +swtdcpuvery_low +swtdiovery_low " -S mix phx.server

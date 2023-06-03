@@ -51,7 +51,7 @@ defmodule ArweaveEx.MixProject do
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
-      {:arweave, path: "arweave", runtime: false},
+      {:arweave, path: "arweave/apps/arweave", runtime: false},
       {:ar_sqlite3, path: "arweave/apps/ar_sqlite3"},
       {:cowlib, "~> 2.11.0", override: true}
     ]
