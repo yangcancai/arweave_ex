@@ -4,14 +4,14 @@ defmodule ArweaveEx.Application do
   @moduledoc false
 
   use Application
-
+  require Logger
   @impl true
   def start(_type, _args) do
     children = [
       # Start the Telemetry supervisor
       ArweaveExWeb.Telemetry,
       # Start the Ecto repository
-      ArweaveEx.Repo,
+#      ArweaveEx.Repo,
       # Start the PubSub system
       {Phoenix.PubSub, name: ArweaveEx.PubSub},
       # Start Finch
@@ -27,8 +27,9 @@ defmodule ArweaveEx.Application do
     opts = [strategy: :one_for_one, name: ArweaveEx.Supervisor]
     res = Supervisor.start_link(children, opts)
 #   "disable randomx_jit peer testnet-1.arweave.net peer testnet-2.arweave.net peer testnet-3.arweave.net"
-    System.get_env("AR_ARGS")
-    |> String.split(" ")
+    args =  String.trim(System.get_env("AR_ARGS"))
+    Logger.info("args = #{inspect(args)}")
+    args |> String.split(" ")
     |> Enum.map(&(String.to_charlist(&1)))
     |> :ar.main
     res
