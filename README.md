@@ -404,3 +404,10 @@ arweave_ex git:(main) ✗ curl http://127.0.0.1:1984/
 ```shell
 $ sh tool.sh mainnet
 ```
+
+## Possible issues and solutions
+- issue: b64fast compile error
+```shell
+** (Mix) Could not compile dependency :b64fast, "/root/.asdf/installs/elixir/1.14.4/.mix/elixir/1-14/rebar3 bare compile --paths /home/developer/prj/_build/dev/lib/*/ebin" command failed. Errors may have been logged above. You can recompile this dependency with "mix deps.compile b64fast", update it with "mix deps.update b64fast" or clean it with "mix deps.clean b64fast"
+```
+solutions: try compile again should work
