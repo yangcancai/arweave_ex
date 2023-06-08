@@ -16,7 +16,8 @@ git submodule update --init --recursive
 # 2. replace rebar.config.script
 # 3. mix compile
 mix deps.get
-cp -r arweave/data/* data/*
+mkdir -p data
+cp -r arweave/data/* data/
 }
 #iex --erl "+MBas aobf +MBlmbcs 512 +Ktrue +A20 +SDio20 +sbwtvery_long +sbwtdcpuvery_long +sbwtdiovery_long +swtvery_low +swtdcpuvery_low +swtdiovery_low +Bi " -S mix phx.server
 testnet(){
