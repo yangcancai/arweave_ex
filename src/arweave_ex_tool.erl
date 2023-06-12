@@ -11,11 +11,26 @@
 
 -include_lib("arweave/include/ar.hrl").
 -include_lib("arweave/include/ar_config.hrl").
--export([init/0]).
+-export([init/0, balances/0, balance/1]).
+
+balances() ->
+	{ok, Config} = application:get_env(arweave, config),
+	WalletsDir =  filename:join(Config#config.data_dir, "wallets"),
+	{ok, Entries} = file:list_dir_all(WalletsDir),
+	lists:map(
+		fun	(File) ->
+			  Addr = ar_wallet:to_address(ar_wallet:load_keyfile(filename:join(WalletsDir, File))),
+				balance(Addr)
+		end,
+		Entries
+	).
+
+balance(Addr) ->
+	ar_wallets:get_balance(Addr).
 
 %% API
 init() ->
-	application:set_env(arweave, config, #config{data_dir = "./data_testnet",port = 1984}),
+	application:set_env(arweave, config, #config{data_dir = "./data_localtest",port = 1984}),
 	clear(),
 	%% This wallet is never spent from or deposited to, so the balance is predictable
 	Pub1 = ar_wallet:new_keyfile(),
@@ -25,7 +40,7 @@ init() ->
 		{ar_wallet:to_address(Pub1), ?AR(10000), <<>>},
 		{ar_wallet:to_address(Pub2), ?AR(10000), <<>>},
 		{ar_wallet:to_address(Pub3), ?AR(10), <<"TEST_ID">>}
-	], 0),%% Set difficulty to 0 to speed up tests
+	], 1),%% Set difficulty to 0 to speed up tests
 	start(B0),
 	{Pub1, Pub2, Pub3, B0}.
 clear() ->
@@ -69,8 +84,7 @@ start(B0, RewardAddr, Config, StorageModules) ->
 		enable = [search_in_rocksdb_when_mining, serve_tx_data_without_limits,
 				double_check_nonce_limiter, legacy_storage_repacking, serve_wallet_lists,
 				pack_served_chunks | Config#config.enable],
-		mining_server_chunk_cache_size_limit = 4,
-		debug = true
+		mining_server_chunk_cache_size_limit = 4
 	}),
 	{ok, _} = application:ensure_all_started(arweave, permanent),
 	wait_until_joined(),
@@ -119,7 +133,7 @@ wait_until_syncs_genesis_data(Offset, WeaveSize, Packing) ->
 			end
 		end,
 		200,
-		10000
+		1000
 	),
 	wait_until_syncs_genesis_data(Offset + ?DATA_CHUNK_SIZE, WeaveSize, Packing).
 

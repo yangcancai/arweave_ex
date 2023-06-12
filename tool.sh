@@ -20,6 +20,13 @@ mkdir -p data
 cp -r arweave/data/* data/
 }
 #iex --erl "+MBas aobf +MBlmbcs 512 +Ktrue +A20 +SDio20 +sbwtvery_long +sbwtdcpuvery_long +sbwtdiovery_long +swtvery_low +swtdcpuvery_low +swtdiovery_low +Bi " -S mix phx.server
+localtest(){
+  mkdir -p data_localtest
+  cp rebar.config.script_localtest arweave/apps/arweave/rebar.config.script
+  mix compile
+  export AR_ARGS="$RANDOMX_JIT"
+  iex --erl "+MBas aobf +MBlmbcs 512 +Ktrue +A20 +SDio20 +sbwtvery_long +sbwtdcpuvery_long +sbwtdiovery_long +swtvery_low +swtdcpuvery_low +swtdiovery_low " -S mix phx.server
+}
 testnet(){
   cp rebar.config.script_testnet arweave/apps/arweave/rebar.config.script
   mix compile
@@ -52,6 +59,7 @@ build(){
 help(){
   echo "sh tool.sh setup"
   echo "sh tool.sh testnet"
+  echo "sh tool.sh localtest"
   echo "sh tool.sh mainnet"
   echo "sh tool.sh build"
 }
@@ -59,6 +67,7 @@ case $1 in
 build) build $2;;
 setup) setup;;
 testnet) testnet;;
+localtest) localtest;;
 mainnet) mainnet;;
 *) help;;
 esac

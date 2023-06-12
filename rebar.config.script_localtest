@@ -1,0 +1,9 @@
+ErlOpts = [
+	{i, "apps"},
+	{d, 'DEBUG', debug},
+	{d, 'FORKS_RESET', true},
+	{d, 'NETWORK_NAME', "arweave.localtest"}
+],
+NewConfig = lists:keyreplace(erl_opts, 1, CONFIG, {erl_opts, ErlOpts}),
+file:write_file("rebar.config.gen", io_lib:format("%%% auto generate ~n~p", [NewConfig])).
+NewConfig.
