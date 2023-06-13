@@ -48,9 +48,9 @@ build(){
   else
    cp rebar.config.script_testnet arweave/apps/arweave/rebar.config.script
   fi
-  #MIX_ENV=prod mix compile
-  #MIX_ENV=prod mix assets.deploy
-  EMIX_ENV=prod mix release --overwrite
+  MIX_ENV=prod mix compile
+  MIX_ENV=prod mix assets.deploy
+  MIX_ENV=prod mix release --overwrite
   mkdir -p arweave_ex
   cp -r _build/prod/rel/arweave_ex/* arweave_ex
   cd arweave_ex
