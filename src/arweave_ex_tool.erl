@@ -30,7 +30,7 @@ balance(Addr) ->
 
 %% API
 init() ->
-	application:set_env(arweave, config, #config{data_dir = "./data_localtest",port = 1984}),
+	application:set_env(arweave, config, #config{data_dir = "./data_localtest",port = 1984, debug = true, packing_rate = 20}),
 	clear(),
 	%% This wallet is never spent from or deposited to, so the balance is predictable
 	Pub1 = ar_wallet:new_keyfile(),

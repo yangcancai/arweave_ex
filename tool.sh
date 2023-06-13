@@ -43,6 +43,8 @@ mainnet(){
 build(){
   if [ "$1"=="mainnet" ]; then
     cp rebar.config.script_mainnet arweave/apps/arweave/rebar.config.script
+  elif [ $1=="localtest" ]; then
+   cp rebar.config.script_localtest arweave/apps/arweave/rebar.config.script
   else
    cp rebar.config.script_testnet arweave/apps/arweave/rebar.config.script
   fi
