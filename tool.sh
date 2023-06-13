@@ -41,16 +41,16 @@ mainnet(){
   iex --erl "+MBas aobf +MBlmbcs 512 +Ktrue +A20 +SDio20 +sbwtvery_long +sbwtdcpuvery_long +sbwtdiovery_long +swtvery_low +swtdcpuvery_low +swtdiovery_low " -S mix phx.server
 }
 build(){
-  if [ "$1"=="mainnet" ]; then
+  if [ "$1" = "mainet" ]; then
     cp rebar.config.script_mainnet arweave/apps/arweave/rebar.config.script
-  elif [ $1=="localtest" ]; then
+  elif [ "$1" = "localtest" ]; then
    cp rebar.config.script_localtest arweave/apps/arweave/rebar.config.script
   else
    cp rebar.config.script_testnet arweave/apps/arweave/rebar.config.script
   fi
-  MIX_ENV=prod mix compile
-  MIX_ENV=prod mix assets.deploy
-  MIX_ENV=prod mix release --overwrite
+  #MIX_ENV=prod mix compile
+  #MIX_ENV=prod mix assets.deploy
+  EMIX_ENV=prod mix release --overwrite
   mkdir -p arweave_ex
   cp -r _build/prod/rel/arweave_ex/* arweave_ex
   cd arweave_ex
