@@ -24,7 +24,7 @@ localtest(){
   mkdir -p data_localtest
   cp rebar.config.script_localtest arweave/apps/arweave/rebar.config.script
   mix compile
-  export AR_ARGS="$RANDOMX_JIT"
+  export AR_ARGS="$RANDOMX_JIT debug data_dir data_test_master metrics_dir metrics_master no_auto_join packing_rate 20"
   iex --erl "+MBas aobf +MBlmbcs 512 +Ktrue +A20 +SDio20 +sbwtvery_long +sbwtdcpuvery_long +sbwtdiovery_long +swtvery_low +swtdcpuvery_low +swtdiovery_low " -S mix phx.server
 }
 testnet(){
