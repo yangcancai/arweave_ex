@@ -11,7 +11,7 @@
 
 -include_lib("arweave/include/ar.hrl").
 -include_lib("arweave/include/ar_config.hrl").
--export([init/0, balances/0, balance/1]).
+-export([init/0, balances/0, balance/1, start/0, start/1]).
 
 balances() ->
 	{ok, Config} = application:get_env(arweave, config),
@@ -30,8 +30,7 @@ balance(Addr) ->
 
 %% API
 init() ->
-	application:set_env(arweave, config, #config{data_dir = "./data_localtest",port = 1984, debug = true, packing_rate = 20}),
-	clear(),
+	{ok, _Config} = application:get_env(arweave, config),
 	%% This wallet is never spent from or deposited to, so the balance is predictable
 	Pub1 = ar_wallet:new_keyfile(),
 	Pub2 = ar_wallet:new_keyfile(),
@@ -43,17 +42,13 @@ init() ->
 	], 1),%% Set difficulty to 0 to speed up tests
 	start(B0),
 	{Pub1, Pub2, Pub3, B0}.
-clear() ->
-	{ok, Config} = application:get_env(arweave, config),
-	{ok, Entries} = file:list_dir_all(Config#config.data_dir),
-	lists:foreach(
-		fun	("wallets") ->
-				ok;
-			(Entry) ->
-				file:del_dir_r(filename:join(Config#config.data_dir, Entry))
-		end,
-		Entries
-	).
+
+%% @doc Start a fresh master node.
+start() ->
+	[B0] = ar_weave:init(),
+	start(B0, ar_wallet:to_address(ar_wallet:new_keyfile()),
+			element(2, application:get_env(arweave, config))).
+
 %% @doc Start a fresh master node with the given genesis block.
 start(B0) ->
 	start(B0, ar_wallet:to_address(ar_wallet:new_keyfile()),
@@ -69,6 +64,7 @@ start(B0, RewardAddr, Config) ->
 %% @doc Start a fresh master node with the given genesis block, mining address, config,
 %% and storage modules.
 start(B0, RewardAddr, Config, StorageModules) ->
+	clean_up_and_stop(),
 	write_genesis_files(Config#config.data_dir, B0),
 	ok = application:set_env(arweave, config, Config#config{
 		start_from_block_index = true,
@@ -171,3 +167,26 @@ write_genesis_files(DataDir, B0) ->
 					B0#block.account_tree)
 		),
 	ok = file:write_file(WalletListFilepath, WalletListJSON).
+
+clean_up_and_stop() ->
+	Config = stop(),
+	{ok, Entries} = file:list_dir_all(Config#config.data_dir),
+	lists:foreach(
+		fun	("wallets") ->
+				ok;
+			(Entry) ->
+				file:del_dir_r(filename:join(Config#config.data_dir, Entry))
+		end,
+		Entries
+	).
+
+stop() ->
+	case application_controller:is_running(arweave) of
+		true ->
+	      application:stop(arweave),
+	      ok = ar:stop_dependencies();
+	  _->
+				ok
+	end,
+  {ok, Config} = application:get_env(arweave, config),
+	Config.
