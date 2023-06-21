@@ -11,7 +11,15 @@
 
 -include_lib("arweave/include/ar.hrl").
 -include_lib("arweave/include/ar_config.hrl").
--export([init/0, balances/0, balance/1, start/0, start/1]).
+-export([init/0, balances/0, balance/1, start/0, start/1, start/2]).
+
+%% May occasionally take quite long on a slow CI server, expecially in tests
+%% with height >= 20 (2 difficulty retargets).
+-define(WAIT_UNTIL_BLOCK_HEIGHT_TIMEOUT, 180000).
+-define(WAIT_UNTIL_RECEIVES_TXS_TIMEOUT, 30000).
+%% Sometimes takes a while on a slow machine
+-define(SLAVE_START_TIMEOUT, 40000).
+
 
 balances() ->
 	{ok, Config} = application:get_env(arweave, config),
@@ -43,6 +51,11 @@ init() ->
 	start(B0),
 	{Pub1, Pub2, Pub3, B0}.
 
+
+%%%===================================================================
+%%% Public interface.
+%%%===================================================================
+
 %% @doc Start a fresh master node.
 start() ->
 	[B0] = ar_weave:init(),
@@ -53,6 +66,10 @@ start() ->
 start(B0) ->
 	start(B0, ar_wallet:to_address(ar_wallet:new_keyfile()),
 			element(2, application:get_env(arweave, config))).
+
+%% @doc Start a fresh master node with the given genesis block and mining address.
+start(B0, RewardAddr) ->
+	start(B0, RewardAddr, element(2, application:get_env(arweave, config))).
 
 %% @doc Start a fresh master node with the given genesis block, mining address, and config.
 start(B0, RewardAddr, Config) ->
@@ -80,13 +97,15 @@ start(B0, RewardAddr, Config, StorageModules) ->
 		enable = [search_in_rocksdb_when_mining, serve_tx_data_without_limits,
 				double_check_nonce_limiter, legacy_storage_repacking, serve_wallet_lists,
 				pack_served_chunks | Config#config.enable],
-		mining_server_chunk_cache_size_limit = 4
+		mining_server_chunk_cache_size_limit = 4,
+		debug = true
 	}),
 	{ok, _} = application:ensure_all_started(arweave, permanent),
 	wait_until_joined(),
 	wait_until_syncs_genesis_data(),
 	{whereis(ar_node_worker), B0}.
 
+%% @doc Wait until the master node joins the network (initializes the state).
 wait_until_joined() ->
 	ar_util:do_until(
 		fun() -> ar_node:is_joined() end,
@@ -94,44 +113,21 @@ wait_until_joined() ->
 		60 * 1000
 	 ).
 
-wait_until_syncs_genesis_data() ->
-	WeaveSize = (ar_node:get_current_block())#block.weave_size,
-	wait_until_syncs_genesis_data(0, WeaveSize, any),
-	%% Once the data is stored in the disk pool, make the storage modules
-	%% copy the missing data over from each other. This procedure is executed on startup
-	%% but the disk pool did not have any data at the time.
-	{ok, Config} = application:get_env(arweave, config),
-	[gen_server:cast(list_to_atom("ar_data_sync_" ++ ar_storage_module:id(Module)),
-			sync_data) || Module <- Config#config.storage_modules],
-	wait_until_syncs_genesis_data(0, WeaveSize, spora_2_5),
-	wait_until_syncs_genesis_data(0, WeaveSize, {spora_2_6, Config#config.mining_addr}).
+%%%===================================================================
+%%% Private functions.
+%%%===================================================================
 
-wait_until_syncs_genesis_data(Offset, WeaveSize, _Packing) when Offset >= WeaveSize ->
-	ok;
-wait_until_syncs_genesis_data(Offset, WeaveSize, Packing) ->
-	true = ar_util:do_until(
-		fun() ->
-			case Packing of
-				any ->
-					case ar_sync_record:is_recorded(Offset + 1, ar_data_sync) of
-						false ->
-							false;
-						_ ->
-							true
-					end;
-				_ ->
-					case ar_sync_record:is_recorded(Offset + 1, {ar_data_sync, Packing}) of
-						{{true, _}, _} ->
-							true;
-						_ ->
-							false
-					end
-			end
+clean_up_and_stop() ->
+	Config = stop(),
+	{ok, Entries} = file:list_dir_all(Config#config.data_dir),
+	lists:foreach(
+		fun	("wallets") ->
+				ok;
+			(Entry) ->
+				file:del_dir_r(filename:join(Config#config.data_dir, Entry))
 		end,
-		200,
-		1000
-	),
-	wait_until_syncs_genesis_data(Offset + ?DATA_CHUNK_SIZE, WeaveSize, Packing).
+		Entries
+	).
 
 write_genesis_files(DataDir, B0) ->
 	BH = B0#block.indep_hash,
@@ -168,25 +164,47 @@ write_genesis_files(DataDir, B0) ->
 		),
 	ok = file:write_file(WalletListFilepath, WalletListJSON).
 
-clean_up_and_stop() ->
-	Config = stop(),
-	{ok, Entries} = file:list_dir_all(Config#config.data_dir),
-	lists:foreach(
-		fun	("wallets") ->
-				ok;
-			(Entry) ->
-				file:del_dir_r(filename:join(Config#config.data_dir, Entry))
-		end,
-		Entries
-	).
-
 stop() ->
-	case application_controller:is_running(arweave) of
-		true ->
-	      application:stop(arweave),
-	      ok = ar:stop_dependencies();
-	  _->
-				ok
-	end,
-  {ok, Config} = application:get_env(arweave, config),
+	{ok, Config} = application:get_env(arweave, config),
+	application:stop(arweave),
+	ok = ar:stop_dependencies(),
 	Config.
+
+wait_until_syncs_genesis_data() ->
+	WeaveSize = (ar_node:get_current_block())#block.weave_size,
+	wait_until_syncs_genesis_data(0, WeaveSize, any),
+	%% Once the data is stored in the disk pool, make the storage modules
+	%% copy the missing data over from each other. This procedure is executed on startup
+	%% but the disk pool did not have any data at the time.
+	{ok, Config} = application:get_env(arweave, config),
+	[gen_server:cast(list_to_atom("ar_data_sync_" ++ ar_storage_module:id(Module)),
+			sync_data) || Module <- Config#config.storage_modules],
+	wait_until_syncs_genesis_data(0, WeaveSize, spora_2_5),
+	wait_until_syncs_genesis_data(0, WeaveSize, {spora_2_6, Config#config.mining_addr}).
+
+wait_until_syncs_genesis_data(Offset, WeaveSize, _Packing) when Offset >= WeaveSize ->
+	ok;
+wait_until_syncs_genesis_data(Offset, WeaveSize, Packing) ->
+	true = ar_util:do_until(
+		fun() ->
+			case Packing of
+				any ->
+					case ar_sync_record:is_recorded(Offset + 1, ar_data_sync) of
+						false ->
+							false;
+						_ ->
+							true
+					end;
+				_ ->
+					case ar_sync_record:is_recorded(Offset + 1, {ar_data_sync, Packing}) of
+						{{true, _}, _} ->
+							true;
+						_ ->
+							false
+					end
+			end
+		end,
+		200,
+		10000
+	),
+	wait_until_syncs_genesis_data(Offset + ?DATA_CHUNK_SIZE, WeaveSize, Packing).
