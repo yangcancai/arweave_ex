@@ -53,6 +53,7 @@ build(){
   MIX_ENV=prod mix release --overwrite
   mkdir -p arweave_ex
   cp -r _build/prod/rel/arweave_ex/* arweave_ex
+  cp arweave/data arweave_ex
   cd arweave_ex
   rm -rf *.gz
   tar -zcf arweave_ex-0.1.0.tar.gz bin data erts-* lib releases
