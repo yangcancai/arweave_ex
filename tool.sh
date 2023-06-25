@@ -41,7 +41,7 @@ mainnet(){
   iex --erl "+MBas aobf +MBlmbcs 512 +Ktrue +A20 +SDio20 +sbwtvery_long +sbwtdcpuvery_long +sbwtdiovery_long +swtvery_low +swtdcpuvery_low +swtdiovery_low " -S mix phx.server
 }
 build(){
-  if [ "$1" = "mainet" ]; then
+  if [ "$1" = "mainnet" ]; then
     cp rebar.config.script_mainnet arweave/apps/arweave/rebar.config.script
   elif [ "$1" = "localtest" ]; then
    cp rebar.config.script_localtest arweave/apps/arweave/rebar.config.script
