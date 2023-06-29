@@ -11,7 +11,7 @@
 
 -include_lib("arweave/include/ar.hrl").
 -include_lib("arweave/include/ar_config.hrl").
--export([init/0, balances/0, balance/1, start/0, start/1, start/2]).
+-export([init/0, balances/0, balance/1, start/0, start/1, start/2, clean_up_and_stop/0, create_genesis/1]).
 
 %% May occasionally take quite long on a slow CI server, expecially in tests
 %% with height >= 20 (2 difficulty retargets).
@@ -38,7 +38,6 @@ balance(Addr) ->
 
 %% API
 init() ->
-	{ok, _Config} = application:get_env(arweave, config),
 	%% This wallet is never spent from or deposited to, so the balance is predictable
 	Pub1 = ar_wallet:new_keyfile(),
 	Pub2 = ar_wallet:new_keyfile(),
@@ -51,7 +50,10 @@ init() ->
 	start(B0),
 	{Pub1, Pub2, Pub3, B0}.
 
-
+create_genesis(Dir) ->
+	[B0] = ar_weave:init(),
+	write_genesis_files(Dir, B0),
+	ok.
 %%%===================================================================
 %%% Public interface.
 %%%===================================================================
