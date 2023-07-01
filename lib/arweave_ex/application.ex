@@ -11,7 +11,7 @@ defmodule ArweaveEx.Application do
       # Start the Telemetry supervisor
       ArweaveExWeb.Telemetry,
       # Start the Ecto repository
-#      ArweaveEx.Repo,
+      #      ArweaveEx.Repo,
       # Start the PubSub system
       {Phoenix.PubSub, name: ArweaveEx.PubSub},
       # Start Finch
