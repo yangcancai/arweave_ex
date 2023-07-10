@@ -26,6 +26,7 @@ defmodule ArweaveEx.Application do
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: ArweaveEx.Supervisor]
     res = Supervisor.start_link(children, opts)
+    ArweaveEx.start
     res
   end
 

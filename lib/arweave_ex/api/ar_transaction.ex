@@ -95,7 +95,9 @@ defmodule ArweaveEx.ArTransaction do
       |> Map.new(&format/1)
       |> Jason.Encode.map(opts)
     end
-
+  def format({k, ""}) do
+    {k, ""}
+  end
   def format({:owner, v}) do
     {:owner, :b64fast.encode(v)}
   end
@@ -125,7 +127,10 @@ defmodule ArweaveEx.ArTransaction do
   end
   def format(v), do: v
   end
-
+  def new_ar_tx(target, quantity, data) do
+    tx = new_data_tx(data)
+    %__MODULE__{tx | target: target, quantity: quantity}
+  end
   def new_data_tx(data) do
     tx = new_tx()
     %__MODULE__{tx | data: data, data_size: String.length(data)}
@@ -167,14 +172,19 @@ defmodule ArweaveEx.ArTransaction do
         {privkey, {type, pub}}
       ) do
     tx =
-      {:tx, format, id, last_tx, pub, tags, target, quantity, data, data_size, [], "", "", reward,
+      {:tx, format, id, last_tx, pub, tags, :b64fast.decode(target), quantity, data, data_size, [], "", "", reward,
        denomination, type}
 
     # generate data_root
-    tx1 = :ar_tx.generate_chunk_tree(tx)
+    tx1 = case data_size > 0 do
+        true ->
+        :ar_tx.generate_chunk_tree(tx)
+        _->
+        tx
+    end
     # generate signature
     tx2 = :ar_tx.sign(tx1, {privkey, {type, pub}})
-    IO.puts("tx=#{inspect(tx2)}")
+    IO.puts("tx = #{inspect(tx2)}")
     %__MODULE__{
       artx
       | owner: :erlang.element(5, tx2),

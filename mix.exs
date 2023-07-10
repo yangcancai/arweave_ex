@@ -54,7 +54,11 @@ defmodule ArweaveEx.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:arweave, path: "arweave/apps/arweave", runtime: false},
       {:ar_sqlite3, path: "arweave/apps/ar_sqlite3"},
-      {:cowlib, "~> 2.11.0", override: true}
+      {:cowlib, "~> 2.11.0", override: true},
+      {:tesla, "~> 1.4"},
+      # optional, but recommended adapter
+      {:hackney, "~> 1.17"},
+      {:recon, "~> 2.5.3"}
     ]
   end
 

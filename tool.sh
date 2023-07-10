@@ -22,13 +22,26 @@ mkdir -p data
 cp -r arweave/data/* data/
 }
 #iex --erl "+MBas aobf +MBlmbcs 512 +Ktrue +A20 +SDio20 +sbwtvery_long +sbwtdcpuvery_long +sbwtdiovery_long +swtvery_low +swtdcpuvery_low +swtdiovery_low +Bi " -S mix phx.server
+stop(){
+  erl -pa _build/dev/lib/*/ebin \
+    -noshell \
+    -name stopper@127.0.0.1 \
+    -setcookie test \
+    -s ar shutdown slave@127.0.0.1  \
+    -s ar shutdown master@127.0.0.1  \
+    -s init stop
+}
 localtest(){
   mv_config
   mkdir -p data_localtest
   cp rebar.config.script_localtest arweave/apps/arweave/rebar.config.script
   mix compile
-  export AR_ARGS="$RANDOMX_JIT debug data_dir data_test_master metrics_dir metrics_master no_auto_join packing_rate 20"
-  iex --erl "+MBas aobf +MBlmbcs 512 +Ktrue +A20 +SDio20 +sbwtvery_long +sbwtdcpuvery_long +sbwtdiovery_long +swtvery_low +swtdcpuvery_low +swtdiovery_low " -S mix phx.server
+  export AR_ARGS="$RANDOMX_JIT debug port 1983 data_dir data_test_slave metrics_dir metrics_slave no_auto_join packing_rate 20"
+  elixir --erl "-name slave@127.0.0.1 -setcookie test +MBas aobf +MBlmbcs 512 +Ktrue +A20 +SDio20 +sbwtvery_long +sbwtdcpuvery_long +sbwtdiovery_long +swtvery_low +swtdcpuvery_low +swtdiovery_low " -S mix phx.server > slave.log 2>&1 &
+  sleep 15
+  export AR_ARGS="$RANDOMX_JIT init port 1984 data_dir data_test_master metrics_dir metrics_master packing_rate 20 no_auto_join mining_server_chunk_cache_size_limit 4 enable double_check_nonce_limiter enable search_in_rocksdb_when_mining storage_module 0,209715200,0ZZ1AoHDinyIXVJF34vqMSrBALcQzly89cC5GlVxbWg"
+  export PORT="4001"
+  iex --erl "-name master@127.0.0.1 -setcookie test +MBas aobf +MBlmbcs 512 +Ktrue +A20 +SDio20 +sbwtvery_long +sbwtdcpuvery_long +sbwtdiovery_long +swtvery_low +swtdcpuvery_low +swtdiovery_low" -S mix phx.server
 }
 testnet(){
   mv_config
@@ -78,5 +91,6 @@ setup) setup;;
 testnet) testnet;;
 localtest) localtest;;
 mainnet) mainnet;;
+stop) stop;;
 *) help;;
 esac

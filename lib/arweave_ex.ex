@@ -16,9 +16,14 @@ defmodule ArweaveEx do
     |> String.split(" ")
     |> Enum.map(&String.to_charlist(&1))
     |> :ar.main()
+    case String.split(args, "init") do
+        [_,_] ->
+          init_network
+        _->
+    end
   end
 
   def init_network() do
-    :arweave_ex_tool.init()
+    :arweave_ex_tool.init_new()
   end
 end

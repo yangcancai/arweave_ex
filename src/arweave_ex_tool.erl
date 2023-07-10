@@ -11,7 +11,9 @@
 
 -include_lib("arweave/include/ar.hrl").
 -include_lib("arweave/include/ar_config.hrl").
--export([init/0, balances/0, balance/1, start/0, start/1, start/2, clean_up_and_stop/0, create_genesis/1]).
+-export([init/0, balances/0, balance/1, start/0, start/1, start/2, clean_up_and_stop/0, create_genesis/1,
+	slave_start/0, slave_start/1, init_new/0, wait_until_syncs_genesis_data/0, slave_call/3, wait_until_height/1,
+	wait_until_joined/0]).
 
 %% May occasionally take quite long on a slow CI server, expecially in tests
 %% with height >= 20 (2 difficulty retargets).
@@ -19,7 +21,6 @@
 -define(WAIT_UNTIL_RECEIVES_TXS_TIMEOUT, 30000).
 %% Sometimes takes a while on a slow machine
 -define(SLAVE_START_TIMEOUT, 40000).
-
 
 balances() ->
 	{ok, Config} = application:get_env(arweave, config),
@@ -39,16 +40,30 @@ balance(Addr) ->
 %% API
 init() ->
 	%% This wallet is never spent from or deposited to, so the balance is predictable
-	Pub1 = ar_wallet:new_keyfile(),
-	Pub2 = ar_wallet:new_keyfile(),
-	Pub3 = ar_wallet:new_keyfile(),
+	Pub1 = ar_wallet:load_keyfile("data_test_master/wallets/arweave_keyfile_0ZZ1AoHDinyIXVJF34vqMSrBALcQzly89cC5GlVxbWg.json"),
 	[B0] = ar_weave:init([
-		{ar_wallet:to_address(Pub1), ?AR(10000), <<>>},
-		{ar_wallet:to_address(Pub2), ?AR(10000), <<>>},
-		{ar_wallet:to_address(Pub3), ?AR(10), <<"TEST_ID">>}
+		{ar_wallet:to_address(Pub1), ?AR(10000000000000), <<>>}
 	], 1),%% Set difficulty to 0 to speed up tests
-	start(B0),
-	{Pub1, Pub2, Pub3, B0}.
+	start(B0, ar_wallet:to_address(Pub1)),
+	{Pub1, B0}.
+
+init_new() ->
+	Pub1 = ar_wallet:load_keyfile("data_test_master/wallets/arweave_keyfile_0ZZ1AoHDinyIXVJF34vqMSrBALcQzly89cC5GlVxbWg.json"),
+	[B0] = ar_weave:init([
+		{ar_wallet:to_address(Pub1), ?AR(10000000000000), <<>>}
+	], 1),%% Set difficulty to 0 to speed up tests
+	slave_start(B0),
+	start(B0, ar_wallet:to_address(Pub1)),
+%%	disconnect_from_slave(),
+%%	slave_mine(),
+%%	slave_wait_until_height(1),
+%%	ar_node:mine(),
+%%	wait_until_height(1),
+%%	ar_node:mine(),
+%%	MasterBI = wait_until_height(2),
+%%	connect_to_slave(),
+%%	MasterBI = slave_wait_until_height(2),
+	{Pub1, B0}.
 
 create_genesis(Dir) ->
 	[B0] = ar_weave:init(),
@@ -88,6 +103,7 @@ start(B0, RewardAddr, Config, StorageModules) ->
 	ok = application:set_env(arweave, config, Config#config{
 		start_from_block_index = true,
 		auto_join = true,
+		mine = true,
 		peers = [],
 		mining_addr = RewardAddr,
 		storage_modules = StorageModules,
@@ -99,8 +115,8 @@ start(B0, RewardAddr, Config, StorageModules) ->
 		enable = [search_in_rocksdb_when_mining, serve_tx_data_without_limits,
 				double_check_nonce_limiter, legacy_storage_repacking, serve_wallet_lists,
 				pack_served_chunks | Config#config.enable],
-		mining_server_chunk_cache_size_limit = 4,
-		debug = true
+		mining_server_chunk_cache_size_limit = 4
+%%		debug = true
 	}),
 	{ok, _} = application:ensure_all_started(arweave, permanent),
 	wait_until_joined(),
@@ -210,3 +226,122 @@ wait_until_syncs_genesis_data(Offset, WeaveSize, Packing) ->
 		10000
 	),
 	wait_until_syncs_genesis_data(Offset + ?DATA_CHUNK_SIZE, WeaveSize, Packing).
+
+%% @doc Start a fresh slave node.
+slave_start() ->
+	Slave = slave_call(?MODULE, start, [], ?SLAVE_START_TIMEOUT),
+	slave_wait_until_joined(),
+	slave_wait_until_syncs_genesis_data(),
+	Slave.
+
+%% @doc Start a fresh slave node with the given genesis block.
+slave_start(B) ->
+	Slave = slave_call(?MODULE, start, [B], ?SLAVE_START_TIMEOUT),
+	slave_wait_until_joined(),
+	slave_wait_until_syncs_genesis_data(),
+	Slave.
+
+slave_call(Module, Function, Args) ->
+	slave_call(Module, Function, Args, 10000).
+
+slave_call(Module, Function, Args, Timeout) ->
+	Key = rpc:async_call('slave@127.0.0.1', Module, Function, Args),
+	Result = ar_util:do_until(
+		fun() ->
+			case rpc:nb_yield(Key) of
+				timeout ->
+					false;
+				{value, Reply} ->
+					{ok, Reply}
+			end
+		end,
+		200,
+		Timeout
+	),
+	case Result of
+		{error, timeout} ->
+			?LOG_ERROR("Timed out (~pms) waiting for the rpc reply; module: ~p, function: ~p, "
+					"args: ~p.~n", [Timeout, Module, Function, Args]);
+		_ ->
+			ok
+	end,
+	{ok, _} =  Result,
+	element(2, Result).
+slave_wait_until_joined() ->
+	ar_util:do_until(
+		fun() -> slave_call(ar_node, is_joined, []) end,
+		100,
+		60 * 1000
+	 ).
+
+slave_wait_until_syncs_genesis_data() ->
+	ok = slave_call(?MODULE, wait_until_syncs_genesis_data, [], 60000).
+
+slave_mine() ->
+	slave_call(ar_node, mine, []).
+
+slave_wait_until_height(TargetHeight) ->
+	slave_call(?MODULE, wait_until_height, [TargetHeight],
+			?WAIT_UNTIL_BLOCK_HEIGHT_TIMEOUT + 500).
+
+wait_until_height(TargetHeight) ->
+	{ok, BI} = ar_util:do_until(
+		fun() ->
+			case ar_node:get_blocks() of
+				BI when length(BI) - 1 == TargetHeight ->
+					{ok, BI};
+				_ ->
+					false
+			end
+		end,
+		100,
+		?WAIT_UNTIL_BLOCK_HEIGHT_TIMEOUT
+	),
+	BI.
+
+disconnect_from_slave() ->
+	ar_http:block_peer_connections(),
+	slave_call(ar_http, block_peer_connections, []).
+
+connect_to_slave() ->
+	%% Unblock connections possibly blocked in the prior test code.
+	ar_http:unblock_peer_connections(),
+	slave_call(ar_http, unblock_peer_connections, []),
+	%% Make requests to the nodes to make them discover each other.
+	{ok, {{<<"200">>, <<"OK">>}, _, _, _, _}} =
+		ar_http:req(#{
+			method => get,
+			peer => slave_peer(),
+			path => "/info",
+			headers => [{<<"X-P2p-Port">>, integer_to_binary(element(5, master_peer()))},
+					{<<"X-Release">>, integer_to_binary(?RELEASE_NUMBER)}]
+		}),
+	true = ar_util:do_until(
+		fun() ->
+			[master_peer()] == slave_call(ar_peers, get_peers, [])
+		end,
+		200,
+		5000
+	),
+	{ok, {{<<"200">>, <<"OK">>}, _, _, _, _}} =
+		ar_http:req(#{
+			method => get,
+			peer => master_peer(),
+			path => "/info",
+			headers => [{<<"X-P2p-Port">>, integer_to_binary(element(5, slave_peer()))},
+					{<<"X-Release">>, integer_to_binary(?RELEASE_NUMBER)}]
+		}),
+	true = ar_util:do_until(
+		fun() ->
+			[slave_peer()] == ar_peers:get_peers()
+		end,
+		200,
+		5000
+	).
+master_peer() ->
+	{ok, Config} = application:get_env(arweave, config),
+	{127, 0, 0, 1, Config#config.port}.
+
+slave_peer() ->
+	{ok, Config} = slave_call(application, get_env, [arweave, config]),
+	{127, 0, 0, 1, Config#config.port}.
